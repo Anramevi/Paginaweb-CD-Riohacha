@@ -187,7 +187,9 @@
                         
                         <?php 
                         // MTD Coloring
-                        $mtdClass = evaluateKpiStatus($mtdData[$def['id']], $def['meta'], $def['disparador']);
+                        $metaVal = $def['meta'] ?? 0;
+                        $dispVal = $def['disparador'] ?? 0;
+                        $mtdClass = evaluateKpiStatus($mtdData[$def['id']], $metaVal, $dispVal);
                         // Adjust bg-danger to text-danger for MTD if preferred, or keep background
                         // Requirement: "resaltado" -> background is better visibility
                         ?>
@@ -200,7 +202,7 @@
                                 $currentDate = sprintf('%04d-%02d-%02d', $selectedYear, $selectedMonth, $d);
                                 $isEditable = isset($_SESSION['user_id']);
                                 
-                                $cellClass = evaluateKpiStatus($val, $def['meta'], $def['disparador']);
+                                $cellClass = evaluateKpiStatus($val, $metaVal, $dispVal);
                             ?>
                             <td 
                                 id="<?php echo $cellId; ?>"
