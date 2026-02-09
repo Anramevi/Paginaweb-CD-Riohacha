@@ -1,0 +1,42 @@
+:root {
+    --primary-blue: #1e3a8a;
+    --secondary-blue: #3b82f6;
+    --accent-gold: #f59e0b;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f3f4f6;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+}
+
+.sticky-col-1 { position: sticky; left: 0; z-index: 10; border-right: 2px solid #dee2e6 !important; }
+.sticky-col-2 { position: sticky; left: 150px; z-index: 10; border-right: 2px solid #dee2e6 !important; }
+.sticky-col-3 { position: sticky; left: 350px; z-index: 10; }
+.sticky-col-4 { position: sticky; left: 430px; z-index: 10; }
+.sticky-col-5 { position: sticky; left: 510px; z-index: 10; }
+.sticky-col-6 { position: sticky; left: 590px; z-index: 10; border-right: 2px solid #dee2e6 !important; }
+
+/* Ensure sticky headers have higher z-index than sticky columns */
+thead th.sticky-col-1,
+thead th.sticky-col-2,
+thead th.sticky-col-3,
+thead th.sticky-col-4,
+thead th.sticky-col-5,
+thead th.sticky-col-6 {
+    z-index: 20;
+}
+
+.trigger-alert {
+    color: #dc3545 !important; /* Red text */
+    box-shadow: inset 0 0 0 2px #0d6efd !important; /* Blue box inside cell */
+}

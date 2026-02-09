@@ -5,7 +5,12 @@
     <div class="row">
         <!-- Carousel Section -->
         <div class="col-lg-8 mb-4">
-            <div id="mainCarousel" class="carousel slide rounded-4 overflow-hidden shadow-sm" data-bs-ride="carousel">
+            <div id="mainCarousel" class="carousel slide rounded-4 overflow-hidden shadow-sm position-relative" data-bs-ride="carousel">
+                <div class="position-absolute top-0 end-0 m-3" style="z-index: 1050;">
+                    <button class="btn btn-dark btn-sm rounded-circle opacity-75" onclick="toggleFullScreen()" title="Pantalla Completa">
+                        <i class="bi bi-arrows-fullscreen"></i>
+                    </button>
+                </div>
                 <div class="carousel-indicators">
                     <?php foreach ($carouselItems as $index => $item): ?>
                         <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="<?php echo $index; ?>" class="<?php echo $index === 0 ? 'active' : ''; ?>"></button>
@@ -15,7 +20,11 @@
                     <?php foreach ($carouselItems as $index => $item): ?>
                         <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
                             <div style="height: 400px; background-color: #000;">
-                                <img src="<?php echo htmlspecialchars($item['file_path']); ?>" class="d-block w-100 h-100" style="object-fit: cover; opacity: 0.7;" alt="<?php echo htmlspecialchars($item['title']); ?>">
+                                <?php if (isset($item['file_type']) && $item['file_type'] === 'video'): ?>
+                                    <video src="<?php echo htmlspecialchars($item['file_path']); ?>" class="d-block w-100 h-100" style="object-fit: cover; opacity: 0.7;" autoplay muted loop playsinline></video>
+                                <?php else: ?>
+                                    <img src="<?php echo htmlspecialchars($item['file_path']); ?>" class="d-block w-100 h-100" style="object-fit: cover; opacity: 0.7;" alt="<?php echo htmlspecialchars($item['title']); ?>">
+                                <?php endif; ?>
                             </div>
                             <div class="carousel-caption d-none d-md-block text-start" style="bottom: 20%; left: 10%; right: 10%;">
                                 <h2 class="display-5 fw-bold"><?php echo htmlspecialchars($item['title']); ?></h2>
@@ -124,44 +133,45 @@
     <!-- QR Codes Section -->
     <h4 class="fw-bold mb-3">Códigos QR</h4>
     <div class="row mb-5">
-        <div class="col-md-6 mb-4">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4 d-flex justify-content-between align-items-center bg-white">
-                    <div>
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-box-seam fs-3 text-primary me-2"></i>
-                            <h5 class="fw-bold m-0 text-primary-blue">Sedial</h5>
+        <?php if (!empty($qrCodes)): ?>
+            <?php
+            $groupedQRs = ['Sedial' => [], 'SLA' => []];
+            foreach ($qrCodes as $qr) {
+                $cat = $qr['category'] ?? 'Sedial';
+                // If unknown category, default to Sedial or create new key
+                if (!isset($groupedQRs[$cat])) $groupedQRs[$cat] = [];
+                $groupedQRs[$cat][] = $qr;
+            }
+            ?>
+            
+            <?php foreach ($groupedQRs as $category => $qrs): ?>
+                <?php if (!empty($qrs)): ?>
+                    <div class="col-12 mb-3">
+                        <h5 class="text-primary border-bottom pb-2"><?php echo htmlspecialchars($category); ?></h5>
+                    </div>
+                    <?php foreach ($qrs as $qr): ?>
+                    <div class="col-md-4 mb-4">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-body p-4 text-center bg-white">
+                                <div class="mb-3">
+                                    <h5 class="fw-bold text-primary-blue mb-1"><?php echo htmlspecialchars($qr['title']); ?></h5>
+                                    <p class="text-muted small mb-0"><?php echo htmlspecialchars($qr['subtitle']); ?></p>
+                                </div>
+                                <div class="bg-light p-3 rounded d-inline-block">
+                                    <img src="<?php echo htmlspecialchars($qr['image_path']); ?>" alt="<?php echo htmlspecialchars($qr['title']); ?>" class="img-fluid" style="max-width: 150px; height: auto;">
+                                </div>
+                            </div>
                         </div>
-                        <p class="mb-1 fw-bold">Contacto Sedial:</p>
-                        <p class="mb-1 text-primary">+ 57 314 820 5463</p>
-                        <p class="mb-0 text-primary">+ 57 311 830 3704</p>
                     </div>
-                    <div class="bg-light p-2 rounded">
-                        <!-- Placeholder QR -->
-                        <i class="bi bi-qr-code fs-1"></i>
-                    </div>
-                </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            <?php endforeach; ?>
+
+        <?php else: ?>
+            <div class="col-12">
+                <div class="alert alert-light text-center">No hay códigos QR configurados.</div>
             </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4 d-flex justify-content-between align-items-center bg-white">
-                    <div>
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-shield-check fs-3 text-success me-2"></i>
-                            <h5 class="fw-bold m-0 text-primary-blue">SLA</h5>
-                        </div>
-                        <p class="mb-1 fw-bold">Contacto SLA:</p>
-                        <p class="mb-1 text-primary">+ 57 300 333 1427</p>
-                        <p class="mb-0 text-primary">+ 57 351 722 8207</p>
-                    </div>
-                    <div class="bg-light p-2 rounded">
-                        <!-- Placeholder QR -->
-                        <i class="bi bi-qr-code fs-1"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <?php endif; ?>
     </div>
 
     <!-- Pillars Section -->
@@ -170,23 +180,28 @@
         <!-- Static Pillars for Demo if DB is empty, otherwise Loop -->
         <?php 
         $defaultPillars = [
-            ['icon' => 'bi-truck', 'name' => 'Flota', 'bg' => 'bg-primary-subtle'],
-            ['icon' => 'bi-building', 'name' => 'Warehouse', 'bg' => 'bg-primary-subtle'],
-            ['icon' => 'bi-people', 'name' => 'People', 'bg' => 'bg-primary-subtle'],
-            ['icon' => 'bi-shield-lock', 'name' => 'Seguridad', 'bg' => 'bg-primary-subtle'],
-            ['icon' => 'bi-box', 'name' => 'Reparto', 'bg' => 'bg-primary-subtle'],
+            ['icon' => 'bi-truck', 'name' => 'Flota', 'bg' => 'bg-primary-subtle', 'key' => 'flota'],
+            ['icon' => 'bi-building', 'name' => 'Almacen', 'bg' => 'bg-primary-subtle', 'key' => 'almacen'],
+            ['icon' => 'bi-people', 'name' => 'People', 'bg' => 'bg-primary-subtle', 'key' => 'people'],
+            ['icon' => 'bi-shield-lock', 'name' => 'Seguridad', 'bg' => 'bg-primary-subtle', 'key' => 'seguridad'],
+            ['icon' => 'bi-box', 'name' => 'Reparto', 'bg' => 'bg-primary-subtle', 'key' => 'reparto'],
         ];
+        // If DB pillars exist, try to map them or just use default for now since we want specific links
+        // Ideally we should use the DB pillars but we need to ensure icons and keys are correct.
+        // For this task, updating the hardcoded list is safer to guarantee the names and links are correct immediately.
         ?>
         <?php foreach ($defaultPillars as $pillar): ?>
         <div class="col">
-            <div class="card border-0 shadow-sm h-100 text-center py-4 rounded-4 hover-shadow transition">
-                <div class="card-body">
-                    <div class="rounded-circle <?php echo $pillar['bg']; ?> d-inline-flex p-3 mb-3 text-primary">
-                        <i class="bi <?php echo $pillar['icon']; ?> fs-2"></i>
+            <a href="<?php echo url('pillar?name=' . $pillar['key']); ?>" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 text-center py-4 rounded-4 hover-shadow transition">
+                    <div class="card-body">
+                        <div class="rounded-circle <?php echo $pillar['bg']; ?> d-inline-flex p-3 mb-3 text-primary">
+                            <i class="bi <?php echo $pillar['icon']; ?> fs-2"></i>
+                        </div>
+                        <h6 class="fw-bold text-primary-blue mb-0"><?php echo $pillar['name']; ?></h6>
                     </div>
-                    <h6 class="fw-bold text-primary-blue mb-0"><?php echo $pillar['name']; ?></h6>
                 </div>
-            </div>
+            </a>
         </div>
         <?php endforeach; ?>
     </div>

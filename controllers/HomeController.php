@@ -43,10 +43,16 @@ class HomeController {
         $stmt->execute();
         $pillars = $stmt->fetchAll();
 
+        // Fetch QR Codes
+        $stmt = $this->pdo->prepare("SELECT * FROM qr_codes ORDER BY id DESC");
+        $stmt->execute();
+        $qrCodes = $stmt->fetchAll();
+
         view('home/index', [
             'carouselItems' => $carouselItems,
             'nosotros' => $nosotros,
-            'pillars' => $pillars
+            'pillars' => $pillars,
+            'qrCodes' => $qrCodes
         ]);
     }
 }

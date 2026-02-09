@@ -65,10 +65,64 @@ switch ($path) {
         $controller->index();
         break;
         
+    case '/dashboard/update':
+        require 'controllers/DashboardController.php';
+        $controller = new DashboardController($pdo);
+        $controller->update();
+        break;
+        
     case '/admin':
     case '/admin/dashboard':
         require 'controllers/AdminController.php';
         $controller = new AdminController($pdo);
+        $controller->index();
+        break;
+
+    case '/admin/add_qr':
+        require 'controllers/AdminController.php';
+        $controller = new AdminController($pdo);
+        $controller->addQr();
+        break;
+
+    case '/admin/delete_qr':
+        require 'controllers/AdminController.php';
+        $controller = new AdminController($pdo);
+        $controller->deleteQr();
+        break;
+
+    case '/admin/save_user':
+        require 'controllers/AdminController.php';
+        $controller = new AdminController($pdo);
+        $controller->saveUser();
+        break;
+
+    case '/admin/delete_user':
+        require 'controllers/AdminController.php';
+        $controller = new AdminController($pdo);
+        $controller->deleteUser();
+        break;
+
+    case '/admin/save_carousel':
+        require 'controllers/AdminController.php';
+        $controller = new AdminController($pdo);
+        $controller->saveCarousel();
+        break;
+
+    case '/admin/delete_carousel':
+        require 'controllers/AdminController.php';
+        $controller = new AdminController($pdo);
+        $controller->deleteCarousel();
+        break;
+
+    case '/admin/update_content':
+        require 'controllers/AdminController.php';
+        $controller = new AdminController($pdo);
+        $controller->updateContent();
+        break;
+
+    case '/pillar':
+        require 'controllers/PillarController.php';
+        $controller = new PillarController($pdo);
         $controller->index();
         break;
         

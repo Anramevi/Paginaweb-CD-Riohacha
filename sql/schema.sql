@@ -1,4 +1,9 @@
 -- Database Schema for CD Riohacha Web App
+-- Updated: 2026-02-08
+-- Includes support for:
+-- 1. Video uploads in Carousel (file_type column)
+-- 2. QR Code categories (Sedial/SLA)
+-- 3. Renamed 'Warehouse' pillar to 'Almacén'
 
 -- Crear la base de datos si no existe
 CREATE DATABASE IF NOT EXISTS cd_riohacha_db;
@@ -72,22 +77,60 @@ CREATE TABLE IF NOT EXISTS pillar_info (
 -- Insertar pilares iniciales
 INSERT INTO pillar_info (pillar_name, title, description, last_edited_by) VALUES
 ('flota', 'Flota', 'Gestión y monitoreo de la flota de transporte.', 1),
-('warehouse', 'Warehouse', 'Control de inventario y almacenamiento.', 1),
+('almacen', 'Almacén', 'Control de inventario y almacenamiento.', 1),
 ('people', 'People', 'Gestión del talento humano.', 1),
 ('seguridad', 'Seguridad', 'Protocolos y KPIs de seguridad operativa.', 1),
 ('reparto', 'Reparto', 'Eficiencia en la distribución y entregas.', 1)
 ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
 
--- Tabla de KPIs (kpi_data)
-CREATE TABLE IF NOT EXISTS kpi_data (
+-- Tabla de Definiciones de KPIs (kpi_definitions)
+CREATE TABLE IF NOT EXISTS kpi_definitions (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    kpi_name VARCHAR(100) NOT NULL,
-    indicator VARCHAR(100),
-    unit VARCHAR(20),
-    trigger_condition VARCHAR(50),
-    mtd_value DECIMAL(10,2),
-    daily_values JSON,
-    report_date DATE NOT NULL,
+    kpi_impactado VARCHAR(100) NOT NULL,
+    indicador VARCHAR(100) NOT NULL,
+    unidad_medida VARCHAR(20) NOT NULL,
+    display_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY idx_unique_kpi (kpi_impactado, indicador)
+);
+
+-- Insertar KPIs por defecto
+INSERT INTO kpi_definitions (kpi_impactado, indicador, unidad_medida, display_order) VALUES
+('TRI', '% Cashless', '%', 1),
+('OTIF', '% Refusal', '%', 2),
+('OTIF', 'EF. Cargue', '%', 3),
+('OTIF', 'VH. No disponible', '#', 4),
+('NPS', 'Entrega en rango', '%', 5),
+('ONTIME', 'Salidas antes de 7', '%', 6),
+('TP', 'WNP', 'HL/h', 7),
+('Asset Eff', 'Capacity Weight', '%', 8),
+('Rotación', 'Ausentismo injustificado OL/UC', '#', 9),
+('SHCO', 'Hectolitros bloqueados', 'HL', 10),
+('INFULL', 'Errores de armado', '#', 11),
+('NPS', 'Fallas de bloqueo', '#', 12)
+ON DUPLICATE KEY UPDATE unidad_medida = VALUES(unidad_medida);
+
+-- Tabla de Valores Diarios de KPIs (kpi_values)
+CREATE TABLE IF NOT EXISTS kpi_values (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    kpi_id INT NOT NULL,
+    date_value DATE NOT NULL,
+    value VARCHAR(50), -- VARCHAR para soportar "1/99"
+    updated_by INT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_kpi_date (kpi_name, report_date)
+    FOREIGN KEY (kpi_id) REFERENCES kpi_definitions(id) ON DELETE CASCADE,
+    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL,
+    UNIQUE KEY idx_kpi_date (kpi_id, date_value)
+);
+
+-- Tabla de Códigos QR (qr_codes)
+CREATE TABLE IF NOT EXISTS qr_codes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(100) NOT NULL,
+    subtitle VARCHAR(100),
+    image_path VARCHAR(500) NOT NULL,
+    category ENUM('Sedial', 'SLA') DEFAULT 'Sedial',
+    uploaded_by INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE CASCADE
 );
